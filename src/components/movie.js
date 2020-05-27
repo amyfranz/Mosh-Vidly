@@ -1,5 +1,10 @@
 import React, { Component } from "react";
-import { getMovies, deleteMovie } from "../services/fakeMovieService";
+import {
+  getMovies,
+  deleteMovie,
+  likeMovie,
+} from "../services/fakeMovieService";
+import Like from "./common/like";
 
 export default class movie extends Component {
   constructor() {
@@ -20,6 +25,7 @@ export default class movie extends Component {
               <th>Stock</th>
               <th>Rate</th>
               <th></th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -29,6 +35,9 @@ export default class movie extends Component {
                 <td>{movie.genre.name}</td>
                 <td>{movie.numberInStock}</td>
                 <td>{movie.dailyRentalRate}</td>
+                <td>
+                  <Like movie={movie} handleLike={this.handleLike} />
+                </td>
                 <td>
                   <button
                     className="btn btn-danger btn-sm"
@@ -47,4 +56,11 @@ export default class movie extends Component {
       </div>
     );
   }
+  handleLike = (movie) => {
+    const movies = [...this.state.movies];
+    const index = movies.indexOf(movie);
+    movies[index] = { ...movies[index] };
+    movies[index].liked = !movies[index].liked;
+    this.setState({ movies });
+  };
 }
