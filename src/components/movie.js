@@ -1,22 +1,22 @@
 import React, { Component } from "react";
-import {
-  getMovies,
-  deleteMovie,
-  likeMovie,
-} from "../services/fakeMovieService";
+import { getMovies, deleteMovie } from "../services/fakeMovieService";
 import Like from "./common/like";
+import Pagination from "./common/pagination";
+import { paginate } from "../utils/paginate";
 
 export default class movie extends Component {
   constructor() {
     super();
-    this.state = { movies: getMovies() };
+    this.state = { movies: getMovies(), pageSize: 4, currentPage: 1 };
   }
   render() {
-    const length = this.state.movies.length;
-    if (length < 1) return <p>There are no movies in the database.</p>;
+    const count = this.state.movies.length;
+    const { pageSize, currentPage, movies: allMovies } = this.state;
+    const movies = paginate(allMovies, currentPage, pageSize);
+    if (count < 1) return <p>There are no movies in the database.</p>;
     return (
       <div>
-        <p>Showing {this.state.movies.length} movies in the database.</p>
+        <p>Showing {count} movies in the database.</p>
         <table className="table">
           <thead>
             <tr key="heading">
@@ -29,7 +29,7 @@ export default class movie extends Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.movies.map((movie) => (
+            {movies.map((movie) => (
               <tr key={movie._id}>
                 <td>{movie.title}</td>
                 <td>{movie.genre.name}</td>
@@ -53,6 +53,12 @@ export default class movie extends Component {
             ))}
           </tbody>
         </table>
+        <Pagination
+          count={count}
+          pageSize={pageSize}
+          currentPage={currentPage}
+          onPageChange={this.handlePageChange}
+        />
       </div>
     );
   }
@@ -62,5 +68,8 @@ export default class movie extends Component {
     movies[index] = { ...movies[index] };
     movies[index].liked = !movies[index].liked;
     this.setState({ movies });
+  };
+  handlePageChange = (page) => {
+    this.setState({ currentPage: page });
   };
 }
